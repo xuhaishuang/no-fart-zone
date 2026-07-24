@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🚫 赵晓霞禁止放屁</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a1a;
+  color: #e0e0ff;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 门页面 */
+#door-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  position: relative;
+  z-index: 10;
+}
+#door-page.hidden { display: none; }
+
+.door-title {
+  font-size: 1.1rem;
+  color: #8888aa;
+  letter-spacing: 0.3em;
+  margin-bottom: 2rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.door-container {
+  position: relative;
+  width: 220px;
+  height: 320px;
+  perspective: 800px;
+  cursor: pointer;
+}
+
+.door-frame {
+  position: absolute;
+  inset: 0;
+  border: 3px solid #4a3a6a;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(135deg, #1a1030 0%, #2a1a4a 100%);
+  box-shadow: 0 0 40px rgba(100, 60, 180, 0.3), inset 0 0 30px rgba(0,0,0,0.5);
+}
+
+.door-left, .door-right {
+  position: absolute;
+  top: 3px;
+  width: 48.5%;
+  height: calc(100% - 6px);
+  background: linear-gradient(180deg, #2d1f4e 0%, #1a1035 100%);
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+  border: 1px solid #3a2a5a;
+}
+.door-right {
+  right: 3px;
+  transform-origin: right center;
+}
+
+.door-left::after, .door-right::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #c9a0ff 0%, #6a3aaa 100%);
+  top: 50%;
+  box-shadow: 0 0 10px rgba(160, 100, 255, 0.5);
+}
+.door-left::after { right: 12px; }
+.door-right::after { left: 12px; }
+
+.door-container.open .door-left {
+  transform: rotateY(-110deg);
+}
+.door-container.open .door-right {
+  transform: rotateY(110deg);
+}
+
+.door-glow {
+  position: absolute;
+  inset: 10px;
+  background: radial-gradient(ellipse at center, rgba(160, 120, 255, 0.4) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.8s ease 0.3s;
+  border-radius: 8px;
+}
+.door-container.open .door-glow { opacity: 1; }
+
+.sign {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ff4466, #ff6688);
+  color: white;
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(255, 68, 102, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+  z-index: 5;
+}
+
+.room-name {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #a080d0;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  white-space: nowrap;
+}
+
+.tap-hint {
+  margin-top: 2.5rem;
+  color: #665588;
+  font-size: 0.8rem;
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* 房间页面 */
+#room-page {
+  display: none;
+  min-height: 100vh;
+  padding: 1.5rem 1.2rem;
+  position: relative;
+}
+#room-page.show { display: block; }
+
+.room-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.6s ease;
+}
+.room-header h1 {
+  font-size: 1.4rem;
+  background: linear-gradient(90deg, #a070ff, #ff70a0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.3rem;
+}
+.room-header p {
+  font-size: 0.75rem;
+  color: #665588;
+}
+
+/* 禁止牌 */
+.ban-card {
+  background: linear-gradient(135deg, rgba(255,68,102,0.15), rgba(255,100,130,0.05));
+  border: 1px solid rgba(255,68,102,0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.6s ease 0.2s both;
+}
+
+.ban-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ban-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4466, #ff6688);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 0 20px rgba(255,68,102,0.4);
+  flex-shrink: 0;
+  position: relative;
+}
+.ban-icon::after {
+  content: '';
+  position: absolute;
+  width: 70%;
+  height: 3px;
+  background: white;
+  transform: rotate(-45deg);
+  border-radius: 2px;
+}
+
+.ban-text h2 {
+  font-size: 1.1rem;
+  color: #ff8899;
+  margin-bottom: 0.2rem;
+}
+.ban-text p {
+  font-size: 0.8rem;
+  color: #aa7788;
+  line-height: 1.6;
+}
+
+/* 计数器 */
+.fart-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  margin-top: 0.8rem;
+}
+.fart-counter span {
+  font-size: 0.8rem;
+  color: #aa8899;
+}
+.counter-num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ff6688;
+  min-width: 2rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.counter-num.shake {
+  animation: shake 0.4s ease;
+}
+
+.btn-fart {
+  background: linear-gradient(135deg, #ff4466, #cc3355);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-fart:active {
+  transform: scale(0.92);
+}
+
+/* 房规 */
+.rules-card {
+  background: linear-gradient(135deg, rgba(100,70,180,0.12), rgba(80,50,160,0.05));
+  border: 1px solid rgba(120,80,200,0.25);
+  border-radius: 16px;
+  padding: 1.3rem;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.6s ease 0.4s both;
+}
+.rules-card h3 {
+  font-size: 0.9rem;
+  color: #b090e0;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  font-size: 0.8rem;
+  color: #9988bb;
+  line-height: 1.5;
+}
+.rule-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(160,120,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: #a080d0;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* 飘浮粒子 */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  z-index: 100;
+}
+
+/* 底部 */
+.footer {
+  text-align: center;
+  padding: 2rem 0 1rem;
+  color: #443366;
+  font-size: 0.7rem;
+  animation: fadeUp 0.6s ease 0.6s both;
+}
+
+/* 动画 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 2px 12px rgba(255,68,102,0.5); }
+  50% { box-shadow: 0 2px 24px rgba(255,68,102,0.8); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px) rotate(-2deg); }
+  40% { transform: translateX(6px) rotate(2deg); }
+  60% { transform: translateX(-4px) rotate(-1deg); }
+  80% { transform: translateX(4px) rotate(1deg); }
+}
+@keyframes rise {
+  0% { opacity: 0.8; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-120px) scale(0.3); }
+}
+@keyframes bgFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(10px, -10px) scale(1.05); }
+  66% { transform: translate(-5px, 5px) scale(0.95); }
+}
+
+/* 背景光斑 */
+.bg-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+  animation: bgFloat 8s ease-in-out infinite;
+}
+.bg-blob:nth-child(1) {
+  width: 200px; height: 200px;
+  background: rgba(100, 60, 180, 0.12);
+  top: 10%; left: -50px;
+  animation-delay: 0s;
+}
+.bg-blob:nth-child(2) {
+  width: 160px; height: 160px;
+  background: rgba(255, 68, 102, 0.08);
+  bottom: 20%; right: -30px;
+  animation-delay: -3s;
+}
+.bg-blob:nth-child(3) {
+  width: 120px; height: 120px;
+  background: rgba(80, 120, 255, 0.08);
+  top: 50%; left: 30%;
+  animation-delay: -5s;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-blob"></div>
+<div class="bg-blob"></div>
+<div class="bg-blob"></div>
+
+<!-- 门页面 -->
+<div id="door-page">
+  <div class="door-title">请确认身份后进入</div>
+  <div class="door-container" id="door" onclick="openDoor()">
+    <div class="sign">🚫 赵晓霞禁止入内放屁</div>
+    <div class="door-frame">
+      <div class="door-left"></div>
+      <div class="door-right"></div>
+      <div class="door-glow"></div>
+    </div>
+    <div class="room-name">徐海双的房间</div>
+  </div>
+  <div class="tap-hint">👆 点击开门</div>
+</div>
+
+<!-- 房间页面 -->
+<div id="room-page">
+  <div class="room-header">
+    <h1>🏠 徐海双的房间</h1>
+    <p>私人领地 · 闲人免进 · 放屁重罚</p>
+  </div>
+
+  <div class="ban-card">
+    <div class="ban-main">
+      <div class="ban-icon">💨</div>
+      <div class="ban-text">
+        <h2>赵晓霞 · 放屁禁令</h2>
+        <p>本房间空气质量管理条例第1条：<br>赵晓霞同志禁止在室内释放任何气体，违者罚款。</p>
+      </div>
+    </div>
+    <div class="fart-counter">
+      <span>违规次数</span>
+      <span class="counter-num" id="counter">0</span>
+      <button class="btn-fart" onclick="fartDetected()">又放屁了！</button>
+    </div>
+  </div>
+
+  <div class="rules-card">
+    <h3>📜 房间管理条例</h3>
+    <div class="rule-item">
+      <span class="rule-num">1</span>
+      <span>赵晓霞进入前需签署《不排放气体承诺书》</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-num">2</span>
+      <span>如不慎排放，需立即开窗通风并道歉三遍</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-num">3</span>
+      <span>累计三次违规，取消本房间进入资格24小时</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-num">4</span>
+      <span>徐海双享有最终解释权和空气仲裁权</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-num">5</span>
+      <span>本条例自发布之日起永久有效，不可上诉</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    — 房间管理条例 · 最终版 · 不可修改 —<br>
+    <span style="color:#554477">由徐海双亲自起草 📝</span>
+  </div>
+</div>
+
+<script>
+let count = parseInt(localStorage.getItem('fartCount') || '0');
+document.getElementById('counter').textContent = count;
+
+function openDoor() {
+  const door = document.getElementById('door');
+  door.classList.add('open');
+  setTimeout(() => {
+    document.getElementById('door-page').classList.add('hidden');
+    document.getElementById('room-page').classList.add('show');
+  }, 1000);
+}
+
+function fartDetected() {
+  count++;
+  localStorage.setItem('fartCount', count);
+  const counter = document.getElementById('counter');
+  counter.textContent = count;
+  counter.classList.remove('shake');
+  void counter.offsetWidth;
+  counter.classList.add('shake');
+
+  // 飘出臭气粒子
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => createParticle(), i * 80);
+  }
+
+  // 震动反馈
+  if (navigator.vibrate) navigator.vibrate(100);
+}
+
+function createParticle() {
+  const el = document.createElement('div');
+  el.className = 'particle';
+  const size = 8 + Math.random() * 16;
+  const colors = ['#88cc44', '#aacc55', '#99bb33', '#77aa22', '#bbaa44'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  el.style.cssText = `
+    width: ${size}px; height: ${size}px;
+    background: ${color};
+    left: ${40 + Math.random() * 40}%;
+    top: ${55 + Math.random() * 15}%;
+    animation: rise ${1 + Math.random()}s ease-out forwards;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+</script>
+</body>
+</html>
